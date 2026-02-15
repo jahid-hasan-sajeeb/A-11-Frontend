@@ -4,7 +4,7 @@ ContestForge is a full-stack contest management platform frontend built with Rea
 
 ## Live Site URL
 
-- http://localhost:5173 (development)
+- https://jahid-contestforge.netlify.app/
 
 ## Key Features
 
