@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f4f8f8;
+  --surface: #ffffff;
+  --surface-2: #e5efef;
+  --text: #102222;
+  --text-soft: #496262;
+  --primary: #0f766e;
+  --primary-2: #115e59;
+  --accent: #e85d04;
+  --success: #2f9e44;
+  --warning: #ca6702;
+  --danger: #c1121f;
+  --border: #cfe1e1;
+  --shadow: 0 20px 45px rgba(16, 34, 34, 0.1);
+}
+
+[data-theme="dark"] {
+  --bg: #05191b;
+  --surface: #0d2a2e;
+  --surface-2: #113339;
+  --text: #e9f5f5;
+  --text-soft: #a9c9c9;
+  --primary: #2dd4bf;
+  --primary-2: #14b8a6;
+  --accent: #f59e0b;
+  --success: #4ade80;
+  --warning: #facc15;
+  --danger: #fb7185;
+  --border: #1e4349;
+  --shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 8% 8%, rgba(15, 118, 110, 0.16), transparent 28%),
+    radial-gradient(circle at 95% 10%, rgba(232, 93, 4, 0.14), transparent 32%), var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", "Noto Sans", sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container-pad {
+  width: min(1200px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.glass {
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.65rem 0.8rem;
+}
+
+.input:focus {
+  outline: 2px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  border-color: var(--primary);
+}
+
+.btn {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: linear-gradient(120deg, var(--primary), var(--primary-2));
+  color: white;
+}
+
+.btn-secondary {
+  background: color-mix(in oklab, var(--surface-2) 80%, var(--bg) 20%);
+  color: var(--text);
+}
+
+.btn-accent {
+  background: linear-gradient(120deg, var(--accent), #f97316);
+  color: white;
+}
+
+.section-space {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.card {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: color-mix(in oklab, var(--surface-2) 80%, transparent);
+  color: var(--text-soft);
+}
+
+@media (max-width: 768px) {
+  .section-space {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
