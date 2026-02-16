@@ -1,6 +1,6 @@
 export const Footer = () => {
   return (
-    <footer className="border-t border-[var(--border)] bg-[var(--surface)] py-8">
+    <footer className="border-t border-[var(--border)] bg-[var(--surface)] mt-24 py-10">
       <div className="container-pad grid gap-4 sm:grid-cols-2 sm:items-center">
         <div>
           <p className="text-xs uppercase tracking-wide text-[var(--text-soft)]">ContestForge</p>

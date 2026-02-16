@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
@@ -18,27 +18,27 @@ const TOKEN_KEY = "contestforge-token";
 const auth = firebaseAuth;
 const googleProvider = new GoogleAuthProvider();
 
+const exchangeJwt = async (firebaseUser, setAppUser) => {
+  const firebaseToken = await firebaseUser.getIdToken();
+  const name = firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "Contest User";
+  const email = firebaseUser.email || "";
+  const photoURL = firebaseUser.photoURL || "https://i.ibb.co/4Y5J8z0/profile.png";
+  const res = await api.post("/auth/jwt", { firebaseToken, name, email, photoURL });
+
+  const token = res.data?.data?.token;
+  const user = res.data?.data?.user;
+
+  if (!token || !user) {
+    throw new Error("Failed to exchange Firebase token");
+  }
+
+  localStorage.setItem(TOKEN_KEY, token);
+  setAppUser(user);
+};
+
 export const AuthProvider = ({ children }) => {
   const [appUser, setAppUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const exchangeJwt = useCallback(async (firebaseUser) => {
-    const firebaseToken = await firebaseUser.getIdToken();
-    const name = firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "Contest User";
-    const email = firebaseUser.email || "";
-    const photoURL = firebaseUser.photoURL || "https://i.ibb.co/4Y5J8z0/profile.png";
-    const res = await api.post("/auth/jwt", { firebaseToken, name, email, photoURL });
-
-    const token = res.data?.data?.token;
-    const user = res.data?.data?.user;
-
-    if (!token || !user) {
-      throw new Error("Failed to exchange Firebase token");
-    }
-
-    localStorage.setItem(TOKEN_KEY, token);
-    setAppUser(user);
-  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        await exchangeJwt(firebaseUser);
+        await exchangeJwt(firebaseUser, setAppUser);
       } catch (error) {
         toast.error(getErrorMessage(error, "Login session restore failed"));
         localStorage.removeItem(TOKEN_KEY);
@@ -61,14 +61,14 @@ export const AuthProvider = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, [exchangeJwt]);
+  }, []);
 
-  const refreshSession = useCallback(async () => {
+  const refreshSession = async () => {
     if (!auth.currentUser) {
       throw new Error("No authenticated Firebase user");
     }
-    await exchangeJwt(auth.currentUser);
-  }, [exchangeJwt]);
+    await exchangeJwt(auth.currentUser, setAppUser);
+  };
 
   const signUp = async ({ name, email, password, photoURL }) => {
     const credential = await createUserWithEmailAndPassword(auth, email, password);
@@ -76,19 +76,19 @@ export const AuthProvider = ({ children }) => {
       displayName: name,
       photoURL: photoURL || "https://i.ibb.co/4Y5J8z0/profile.png",
     });
-    await exchangeJwt(credential.user);
+    await exchangeJwt(credential.user, setAppUser);
     return credential.user;
   };
 
   const signIn = async ({ email, password: _password }) => {
     const credential = await signInWithEmailAndPassword(auth, email, _password);
-    await exchangeJwt(credential.user);
+    await exchangeJwt(credential.user, setAppUser);
     return credential.user;
   };
 
   const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
-    await exchangeJwt(result.user);
+    await exchangeJwt(result.user, setAppUser);
     return result.user;
   };
 
@@ -99,19 +99,16 @@ export const AuthProvider = ({ children }) => {
     toast.success("Logged out");
   };
 
-  const value = useMemo(
-    () => ({
-      user: appUser,
-      role: appUser?.role || null,
-      loading,
-      signUp,
-      signIn,
-      signInWithGoogle,
-      logOut,
-      refreshSession,
-    }),
-    [appUser, loading, refreshSession]
-  );
+  const value = {
+    user: appUser,
+    role: appUser?.role || null,
+    loading,
+    signUp,
+    signIn,
+    signInWithGoogle,
+    logOut,
+    refreshSession,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

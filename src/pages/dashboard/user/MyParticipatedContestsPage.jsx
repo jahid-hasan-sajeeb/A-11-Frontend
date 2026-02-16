@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { fetchMyParticipations } from "../../../api/userApi";
@@ -10,10 +9,7 @@ export const MyParticipatedContestsPage = () => {
     queryFn: fetchMyParticipations,
   });
 
-  const sorted = useMemo(
-    () => [...data].sort((a, b) => new Date(a.contest?.deadline) - new Date(b.contest?.deadline)),
-    [data]
-  );
+  const sorted = [...data].sort((a, b) => new Date(a.contest?.deadline) - new Date(b.contest?.deadline));
 
   if (isLoading) return <LoadingSpinner />;
 

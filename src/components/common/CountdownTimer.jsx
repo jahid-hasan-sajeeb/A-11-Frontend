@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
 const getParts = (deadline) => {
@@ -29,10 +29,7 @@ export const CountdownTimer = ({ deadline }) => {
     return () => clearInterval(timer);
   }, [deadline]);
 
-  const label = useMemo(() => {
-    if (value.ended) return "Contest Ended";
-    return `${value.days}d ${value.hours}h ${value.minutes}m ${value.seconds}s`;
-  }, [value]);
+  const label = value.ended ? "Contest Ended" : `${value.days}d ${value.hours}h ${value.minutes}m ${value.seconds}s`;
 
   return (
     <p className={`font-semibold ${value.ended ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>

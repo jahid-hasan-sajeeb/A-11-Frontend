@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js";
@@ -76,7 +76,6 @@ export const PaymentContestPage = () => {
     onSuccess: (data) => {
       const useMock = !data?.clientSecret || data.clientSecret.startsWith("mock_secret_");
       if (useMock) {
-        // Demo mode: register immediately after "Initialize Payment".
         registerMutation.mutate(data.paymentIntentId);
         return;
       }
@@ -85,10 +84,7 @@ export const PaymentContestPage = () => {
     onError: (error) => toast.error(getErrorMessage(error, "Failed to initialize payment")),
   });
 
-  const usingMock = useMemo(
-    () => !intentData?.clientSecret || intentData.clientSecret.startsWith("mock_secret_"),
-    [intentData]
-  );
+  const usingMock = !intentData?.clientSecret || intentData.clientSecret.startsWith("mock_secret_");
 
   if (isLoading) return <LoadingSpinner full />;
 
