@@ -8,18 +8,15 @@ ContestForge is a full-stack contest management platform frontend built with Rea
 
 ## Key Features
 
-- Home page with animated hero banner and backend-powered type search.
-- Popular contests section sorted by participant count.
-- All contests page with type tabs and pagination-ready API integration.
-- Private contest details page with live countdown and submission modal.
-- Contest registration payment flow (Stripe test mode with local mock fallback).
-- Three-role dashboard UX: User, Creator, Admin.
-- Admin panels for user role management and contest moderation.
-- Leaderboard route ranked by dynamic win count.
-- Extra navbar routes: Success Stories and Help Center.
-- Dark/light theme toggle persisted in localStorage.
-- Subtle page animations using AOS.
-- Responsive design across mobile, tablet, and desktop.
+- JWT-based login and registration flow with strong password validation.
+- Demo login buttons for both user and admin accounts.
+- Public contest details page with gallery, related contests, countdown, and submission flow.
+- Explore page with search, filters, sorting, pagination, and skeleton loading cards.
+- Home page with 8+ meaningful sections backed by dynamic API data.
+- Contact page with working backend form submission.
+- Role-based dashboard (User/Creator/Admin) with tables, actions, and dynamic charts.
+- Responsive navbar with hamburger menu and profile dropdown.
+- Reusable UI components and light/dark mode support.
 
 ## Stack
 
@@ -28,7 +25,7 @@ ContestForge is a full-stack contest management platform frontend built with Rea
 - React Router
 - TanStack Query
 - React Hook Form
-- Local mock authentication
+- Local JWT authentication
 - AOS (animations)
 - Axios
 

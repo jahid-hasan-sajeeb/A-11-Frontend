@@ -1,5 +1,10 @@
 import { api } from "../lib/axios";
 
+export const fetchAdminOverview = async () => {
+  const res = await api.get("/admin/overview");
+  return res.data.data;
+};
+
 export const fetchUsers = async (page = 1, limit = 10) => {
   const res = await api.get(`/admin/users?page=${page}&limit=${limit}`);
   return res.data;

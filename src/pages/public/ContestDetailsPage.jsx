@@ -4,15 +4,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
-import { fetchContestDetails, submitContestTask } from "../../api/contestApi";
+import { fetchAllContests, fetchContestDetails, submitContestTask } from "../../api/contestApi";
 import { CountdownTimer } from "../../components/common/CountdownTimer";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
+import { useAuth } from "../../hooks/useAuth";
 import { getErrorMessage } from "../../lib/axios";
 
 export const ContestDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
 
   const {
@@ -25,6 +27,12 @@ export const ContestDetailsPage = () => {
   const { data: contest, isLoading } = useQuery({
     queryKey: ["contest-details", id],
     queryFn: () => fetchContestDetails(id),
+  });
+
+  const { data: relatedData } = useQuery({
+    queryKey: ["related-contests", contest?.type],
+    enabled: Boolean(contest?.type),
+    queryFn: () => fetchAllContests({ page: 1, type: contest.type, sort: "popular" }),
   });
 
   const submitMutation = useMutation({
@@ -47,12 +55,24 @@ export const ContestDetailsPage = () => {
   }
 
   const canSubmit = contest.hasRegistered && !contest.contestEnded;
+  const related = (relatedData?.data || []).filter((item) => item._id !== contest._id).slice(0, 4);
+  const galleryImages = [contest.image, ...related.map((item) => item.image)].filter(Boolean).slice(0, 4);
 
   return (
     <section className="section-space">
       <div className="container-pad grid gap-6 lg:grid-cols-[1.2fr_1fr]">
         <article className="card overflow-hidden">
-          <img src={contest.image} alt={contest.name} className="h-64 w-full object-cover md:h-80" />
+          <div className="grid gap-2 p-2 sm:grid-cols-2">
+            {galleryImages.map((image, index) => (
+              <img
+                key={`${image}-${index}`}
+                src={image}
+                alt={`${contest.name}-${index + 1}`}
+                className={`w-full rounded-xl object-cover ${index === 0 ? "h-64 sm:col-span-2 md:h-80" : "h-36 md:h-44"}`}
+                loading="lazy"
+              />
+            ))}
+          </div>
           <div className="space-y-4 p-5 md:p-7">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-2xl font-black md:text-3xl">{contest.name}</h2>
@@ -62,6 +82,20 @@ export const ContestDetailsPage = () => {
             <div>
               <h3 className="font-bold">Task Instruction</h3>
               <p className="mt-1 text-sm text-[var(--text-soft)]">{contest.taskInstruction}</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <article className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-sm">
+                <p className="text-xs text-[var(--text-soft)]">Contest Type</p>
+                <p className="mt-1 font-semibold">{contest.type}</p>
+              </article>
+              <article className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-sm">
+                <p className="text-xs text-[var(--text-soft)]">Creator</p>
+                <p className="mt-1 font-semibold">{contest.creatorId?.name || "Unknown"}</p>
+              </article>
+              <article className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-sm">
+                <p className="text-xs text-[var(--text-soft)]">Status</p>
+                <p className="mt-1 font-semibold">{contest.status}</p>
+              </article>
             </div>
           </div>
         </article>
@@ -99,7 +133,13 @@ export const ContestDetailsPage = () => {
             type="button"
             className="btn btn-primary w-full"
             disabled={contest.contestEnded || contest.hasRegistered}
-            onClick={() => navigate(`/payment/contest/${id}`)}
+            onClick={() => {
+              if (!user) {
+                navigate("/login", { state: { from: `/contest/${id}` } });
+                return;
+              }
+              navigate(`/payment/contest/${id}`);
+            }}
           >
             {contest.hasRegistered ? "Already Registered" : "Register / Pay"}
           </button>
@@ -108,12 +148,35 @@ export const ContestDetailsPage = () => {
             type="button"
             className="btn btn-secondary w-full"
             disabled={!canSubmit || contest.hasSubmitted}
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              if (!user) {
+                navigate("/login", { state: { from: `/contest/${id}` } });
+                return;
+              }
+              setShowModal(true);
+            }}
           >
             {contest.hasSubmitted ? "Task Already Submitted" : "Submit Task"}
           </button>
         </aside>
       </div>
+
+      {related.length ? (
+        <div className="container-pad mt-8">
+          <h3 className="mb-3 text-xl font-black">Related Contests</h3>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {related.map((item) => (
+              <article key={item._id} className="card overflow-hidden">
+                <img src={item.image} alt={item.name} className="h-36 w-full object-cover" loading="lazy" />
+                <div className="space-y-2 p-3">
+                  <h4 className="font-semibold">{item.name}</h4>
+                  <p className="text-xs text-[var(--text-soft)]">{item.type}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       {showModal ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">

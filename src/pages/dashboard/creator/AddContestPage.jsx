@@ -54,34 +54,34 @@ export const AddContestPage = () => {
       <h2 className="text-2xl font-black">Add Contest</h2>
       <form className="mt-4 grid gap-4 md:grid-cols-2" onSubmit={handleSubmit((values) => mutation.mutate(values))}>
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-semibold">Name</label>
-          <input className="input" {...register("name", { required: "Contest name is required" })} />
+          <label htmlFor="add-name" className="mb-1 block text-sm font-semibold">Name</label>
+          <input id="add-name" className="input" {...register("name", { required: "Contest name is required" })} />
           {errors.name ? <p className="mt-1 text-xs text-[var(--danger)]">{errors.name.message}</p> : null}
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-semibold">Image URL</label>
-          <input className="input" type="url" {...register("image", { required: "Image URL is required" })} />
+          <label htmlFor="add-image" className="mb-1 block text-sm font-semibold">Image URL</label>
+          <input id="add-image" className="input" type="url" {...register("image", { required: "Image URL is required" })} />
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-semibold">Description</label>
-          <textarea className="input" rows={4} {...register("description", { required: true })} />
+          <label htmlFor="add-description" className="mb-1 block text-sm font-semibold">Description</label>
+          <textarea id="add-description" className="input" rows={4} {...register("description", { required: true })} />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-semibold">Entry Fee</label>
-          <input className="input" type="number" step="0.01" {...register("entryFee", { required: true, min: 0 })} />
+          <label htmlFor="add-entry-fee" className="mb-1 block text-sm font-semibold">Entry Fee</label>
+          <input id="add-entry-fee" className="input" type="number" step="0.01" {...register("entryFee", { required: true, min: 0 })} />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-semibold">Prize Money</label>
-          <input className="input" type="number" step="0.01" {...register("prizeMoney", { required: true, min: 1 })} />
+          <label htmlFor="add-prize-money" className="mb-1 block text-sm font-semibold">Prize Money</label>
+          <input id="add-prize-money" className="input" type="number" step="0.01" {...register("prizeMoney", { required: true, min: 1 })} />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-semibold">Contest Type</label>
-          <select className="input" {...register("type", { required: true })}>
+          <label htmlFor="add-type" className="mb-1 block text-sm font-semibold">Contest Type</label>
+          <select id="add-type" className="input" {...register("type", { required: true })}>
             {contestTypes.map((type) => (
               <option key={type} value={type}>
                 {type}
@@ -91,13 +91,14 @@ export const AddContestPage = () => {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-semibold">Deadline</label>
+          <label htmlFor="add-deadline" className="mb-1 block text-sm font-semibold">Deadline</label>
           <Controller
             control={control}
             name="deadline"
             rules={{ required: true }}
             render={({ field }) => (
               <DatePicker
+                id="add-deadline"
                 className="input"
                 selected={field.value}
                 onChange={field.onChange}
@@ -110,8 +111,8 @@ export const AddContestPage = () => {
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-semibold">Task Instruction</label>
-          <textarea className="input" rows={4} {...register("taskInstruction", { required: true })} />
+          <label htmlFor="add-task-instruction" className="mb-1 block text-sm font-semibold">Task Instruction</label>
+          <textarea id="add-task-instruction" className="input" rows={4} {...register("taskInstruction", { required: true })} />
         </div>
 
         <div className="md:col-span-2">

@@ -1,37 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  GoogleAuthProvider,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  updateProfile,
-} from "firebase/auth";
 import toast from "react-hot-toast";
-import { firebaseAuth } from "../firebase/firebase.config";
 import { api, getErrorMessage } from "../lib/axios";
 
 const AuthContext = createContext(null);
-
 const TOKEN_KEY = "contestforge-token";
-const auth = firebaseAuth;
-const googleProvider = new GoogleAuthProvider();
 
-const exchangeJwt = async (firebaseUser, setAppUser) => {
-  const firebaseToken = await firebaseUser.getIdToken();
-  const name = firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "Contest User";
-  const email = firebaseUser.email || "";
-  const photoURL = firebaseUser.photoURL || "https://i.ibb.co/4Y5J8z0/profile.png";
-  const res = await api.post("/auth/jwt", { firebaseToken, name, email, photoURL });
-
-  const token = res.data?.data?.token;
-  const user = res.data?.data?.user;
-
+const saveAuth = ({ token, user }, setAppUser) => {
   if (!token || !user) {
-    throw new Error("Failed to exchange Firebase token");
+    throw new Error("Invalid auth response");
   }
-
   localStorage.setItem(TOKEN_KEY, token);
   setAppUser(user);
 };
@@ -41,59 +18,56 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (!firebaseUser) {
-        localStorage.removeItem(TOKEN_KEY);
-        setAppUser(null);
+    const boot = async () => {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) {
         setLoading(false);
         return;
       }
 
       try {
-        await exchangeJwt(firebaseUser, setAppUser);
-      } catch (error) {
-        toast.error(getErrorMessage(error, "Login session restore failed"));
+        const res = await api.get("/auth/me");
+        setAppUser(res.data?.data || null);
+      } catch (_error) {
         localStorage.removeItem(TOKEN_KEY);
         setAppUser(null);
       } finally {
         setLoading(false);
       }
-    });
+    };
 
-    return () => unsubscribe();
+    boot();
   }, []);
 
   const refreshSession = async () => {
-    if (!auth.currentUser) {
-      throw new Error("No authenticated Firebase user");
-    }
-    await exchangeJwt(auth.currentUser, setAppUser);
+    const res = await api.get("/auth/me");
+    setAppUser(res.data?.data || null);
+    return res.data?.data;
   };
 
   const signUp = async ({ name, email, password, photoURL }) => {
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(credential.user, {
-      displayName: name,
-      photoURL: photoURL || "https://i.ibb.co/4Y5J8z0/profile.png",
-    });
-    await exchangeJwt(credential.user, setAppUser);
-    return credential.user;
+    const res = await api.post("/auth/register", { name, email, password, photoURL });
+    saveAuth(res.data?.data, setAppUser);
+    return res.data?.data?.user;
   };
 
-  const signIn = async ({ email, password: _password }) => {
-    const credential = await signInWithEmailAndPassword(auth, email, _password);
-    await exchangeJwt(credential.user, setAppUser);
-    return credential.user;
+  const signIn = async ({ email, password }) => {
+    const res = await api.post("/auth/login", { email, password });
+    saveAuth(res.data?.data, setAppUser);
+    return res.data?.data?.user;
+  };
+
+  const demoLogin = async (role = "user") => {
+    const res = await api.post("/auth/demo-login", { role });
+    saveAuth(res.data?.data, setAppUser);
+    return res.data?.data?.user;
   };
 
   const signInWithGoogle = async () => {
-    const result = await signInWithPopup(auth, googleProvider);
-    await exchangeJwt(result.user, setAppUser);
-    return result.user;
+    throw new Error("Google login is not enabled in this build");
   };
 
   const logOut = async () => {
-    await signOut(auth);
     localStorage.removeItem(TOKEN_KEY);
     setAppUser(null);
     toast.success("Logged out");
@@ -106,8 +80,11 @@ export const AuthProvider = ({ children }) => {
     signUp,
     signIn,
     signInWithGoogle,
+    demoLogin,
     logOut,
     refreshSession,
+    token: localStorage.getItem(TOKEN_KEY),
+    getErrorMessage,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

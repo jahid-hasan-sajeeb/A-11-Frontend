@@ -2,9 +2,11 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 const userLinks = [
+  { to: "/dashboard", label: "Overview" },
   { to: "/dashboard/my-participated-contests", label: "My Participated Contests" },
   { to: "/dashboard/my-winning-contests", label: "My Winning Contests" },
   { to: "/dashboard/my-profile", label: "My Profile" },
+  { to: "/dashboard/my-settings", label: "My Settings" },
 ];
 
 const creatorLinks = [
@@ -14,8 +16,12 @@ const creatorLinks = [
 ];
 
 const adminLinks = [
+  { to: "/dashboard", label: "Admin Overview" },
   { to: "/dashboard/manage-users", label: "Manage Users" },
   { to: "/dashboard/manage-contests", label: "Manage Contests" },
+  { to: "/dashboard/admin-reports", label: "Reports" },
+  { to: "/dashboard/admin-categories", label: "Categories" },
+  { to: "/dashboard/admin-settings", label: "Settings" },
 ];
 
 const linkStyle = ({ isActive }) =>

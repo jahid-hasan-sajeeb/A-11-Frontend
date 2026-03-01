@@ -8,10 +8,13 @@ export const RegisterPage = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm();
   const { signUp } = useAuth();
   const navigate = useNavigate();
+
+  const passwordValue = watch("password", "");
 
   const onSubmit = async (values) => {
     try {
@@ -28,43 +31,82 @@ export const RegisterPage = () => {
       <div className="container-pad">
         <div className="card mx-auto max-w-lg space-y-5 p-6 md:p-8">
           <h2 className="text-3xl font-black">Create Account</h2>
-          <p className="text-sm text-[var(--text-soft)]">Name, email, password and photo URL.</p>
+          <p className="text-sm text-[var(--text-soft)]">Register with secure password and JWT auth.</p>
 
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div>
-              <label className="mb-1 block text-sm font-semibold">Name</label>
-              <input className="input" {...register("name", { required: "Name is required" })} />
+              <label htmlFor="register-name" className="mb-1 block text-sm font-semibold">
+                Name
+              </label>
+              <input
+                id="register-name"
+                className="input"
+                {...register("name", {
+                  required: "Name is required",
+                  minLength: { value: 2, message: "Name must be at least 2 characters" },
+                })}
+              />
               {errors.name ? <p className="mt-1 text-xs text-[var(--danger)]">{errors.name.message}</p> : null}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-semibold">Email</label>
-              <input className="input" type="email" {...register("email", { required: "Email is required" })} />
+              <label htmlFor="register-email" className="mb-1 block text-sm font-semibold">
+                Email
+              </label>
+              <input
+                id="register-email"
+                className="input"
+                type="email"
+                {...register("email", { required: "Email is required" })}
+              />
               {errors.email ? <p className="mt-1 text-xs text-[var(--danger)]">{errors.email.message}</p> : null}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-semibold">Password</label>
+              <label htmlFor="register-password" className="mb-1 block text-sm font-semibold">
+                Password
+              </label>
               <input
+                id="register-password"
                 className="input"
                 type="password"
                 {...register("password", {
                   required: "Password is required",
-                  minLength: { value: 6, message: "Password must be at least 6 characters" },
+                  minLength: { value: 8, message: "Password must be at least 8 characters" },
+                  pattern: {
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
+                    message: "Use uppercase, lowercase, and a number",
+                  },
                 })}
               />
-              {errors.password ? <p className="mt-1 text-xs text-[var(--danger)]">{errors.password.message}</p> : null}
+              {errors.password ? (
+                <p className="mt-1 text-xs text-[var(--danger)]">{errors.password.message}</p>
+              ) : null}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-semibold">Photo URL</label>
+              <label htmlFor="register-confirm-password" className="mb-1 block text-sm font-semibold">
+                Confirm Password
+              </label>
               <input
+                id="register-confirm-password"
                 className="input"
-                type="url"
-                placeholder="https://"
-                {...register("photoURL", { required: "Photo URL is required" })}
+                type="password"
+                {...register("confirmPassword", {
+                  required: "Please confirm your password",
+                  validate: (value) => value === passwordValue || "Passwords do not match",
+                })}
               />
-              {errors.photoURL ? <p className="mt-1 text-xs text-[var(--danger)]">{errors.photoURL.message}</p> : null}
+              {errors.confirmPassword ? (
+                <p className="mt-1 text-xs text-[var(--danger)]">{errors.confirmPassword.message}</p>
+              ) : null}
+            </div>
+
+            <div>
+              <label htmlFor="register-photo-url" className="mb-1 block text-sm font-semibold">
+                Photo URL (Optional)
+              </label>
+              <input id="register-photo-url" className="input" type="url" placeholder="https://" {...register("photoURL")} />
             </div>
 
             <button className="btn btn-primary w-full" type="submit" disabled={isSubmitting}>
@@ -73,7 +115,10 @@ export const RegisterPage = () => {
           </form>
 
           <p className="text-sm text-[var(--text-soft)]">
-            Already have an account? <Link className="font-semibold text-[var(--primary)]" to="/login">Login</Link>
+            Already have an account?{" "}
+            <Link className="font-semibold text-[var(--primary)]" to="/login">
+              Login
+            </Link>
           </p>
         </div>
       </div>

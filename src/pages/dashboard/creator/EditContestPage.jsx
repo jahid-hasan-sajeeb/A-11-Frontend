@@ -62,37 +62,38 @@ export const EditContestPage = () => {
 
       <form className="mt-4 grid gap-4 md:grid-cols-2" onSubmit={handleSubmit((values) => mutation.mutate(values))}>
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-semibold">Name</label>
-          <input className="input" {...register("name", { required: true })} />
+          <label htmlFor="edit-name" className="mb-1 block text-sm font-semibold">Name</label>
+          <input id="edit-name" className="input" {...register("name", { required: true })} />
         </div>
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-semibold">Image URL</label>
-          <input className="input" {...register("image", { required: true })} />
+          <label htmlFor="edit-image" className="mb-1 block text-sm font-semibold">Image URL</label>
+          <input id="edit-image" className="input" {...register("image", { required: true })} />
         </div>
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-semibold">Description</label>
-          <textarea className="input" rows={4} {...register("description", { required: true })} />
+          <label htmlFor="edit-description" className="mb-1 block text-sm font-semibold">Description</label>
+          <textarea id="edit-description" className="input" rows={4} {...register("description", { required: true })} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-semibold">Entry Fee</label>
-          <input className="input" type="number" step="0.01" {...register("entryFee", { required: true })} />
+          <label htmlFor="edit-entry-fee" className="mb-1 block text-sm font-semibold">Entry Fee</label>
+          <input id="edit-entry-fee" className="input" type="number" step="0.01" {...register("entryFee", { required: true })} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-semibold">Prize Money</label>
-          <input className="input" type="number" step="0.01" {...register("prizeMoney", { required: true })} />
+          <label htmlFor="edit-prize-money" className="mb-1 block text-sm font-semibold">Prize Money</label>
+          <input id="edit-prize-money" className="input" type="number" step="0.01" {...register("prizeMoney", { required: true })} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-semibold">Type</label>
-          <input className="input" {...register("type", { required: true })} />
+          <label htmlFor="edit-type" className="mb-1 block text-sm font-semibold">Type</label>
+          <input id="edit-type" className="input" {...register("type", { required: true })} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-semibold">Deadline</label>
+          <label htmlFor="edit-deadline" className="mb-1 block text-sm font-semibold">Deadline</label>
           <Controller
             control={control}
             name="deadline"
             rules={{ required: true }}
             render={({ field }) => (
               <DatePicker
+                id="edit-deadline"
                 className="input"
                 selected={field.value}
                 onChange={field.onChange}
@@ -103,8 +104,8 @@ export const EditContestPage = () => {
           />
         </div>
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-semibold">Task Instruction</label>
-          <textarea className="input" rows={4} {...register("taskInstruction", { required: true })} />
+          <label htmlFor="edit-task-instruction" className="mb-1 block text-sm font-semibold">Task Instruction</label>
+          <textarea id="edit-task-instruction" className="input" rows={4} {...register("taskInstruction", { required: true })} />
         </div>
 
         <div className="md:col-span-2">

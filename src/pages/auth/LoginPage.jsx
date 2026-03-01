@@ -5,8 +5,13 @@ import { useAuth } from "../../hooks/useAuth";
 import { getErrorMessage } from "../../lib/axios";
 
 export const LoginPage = () => {
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
-  const { signIn, signInWithGoogle } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm();
+  const { signIn, demoLogin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const redirectPath = location.state?.from || "/";
@@ -26,12 +31,15 @@ export const LoginPage = () => {
       <div className="container-pad">
         <div className="card mx-auto max-w-lg space-y-5 p-6 md:p-8">
           <h2 className="text-3xl font-black">Login</h2>
-          <p className="text-sm text-[var(--text-soft)]">Email/password or Google sign-in.</p>
+          <p className="text-sm text-[var(--text-soft)]">Email/password login with JWT session.</p>
 
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div>
-              <label className="mb-1 block text-sm font-semibold">Email</label>
+              <label htmlFor="login-email" className="mb-1 block text-sm font-semibold">
+                Email
+              </label>
               <input
+                id="login-email"
                 className="input"
                 type="email"
                 placeholder="you@example.com"
@@ -41,8 +49,11 @@ export const LoginPage = () => {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-semibold">Password</label>
+              <label htmlFor="login-password" className="mb-1 block text-sm font-semibold">
+                Password
+              </label>
               <input
+                id="login-password"
                 className="input"
                 type="password"
                 placeholder="********"
@@ -56,24 +67,67 @@ export const LoginPage = () => {
             </button>
           </form>
 
-          <button
-            type="button"
-            className="btn btn-secondary w-full"
-            onClick={async () => {
-              try {
-                await signInWithGoogle();
-                toast.success("Google login successful");
-                navigate(redirectPath, { replace: true });
-              } catch (error) {
-                toast.error(getErrorMessage(error, "Google sign-in failed"));
-              }
-            }}
-          >
-            Continue with Google
-          </button>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setValue("email", "user@contestforge.dev");
+                setValue("password", "User1234");
+              }}
+            >
+              Fill Demo User
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setValue("email", "admin@contestforge.dev");
+                setValue("password", "Admin1234");
+              }}
+            >
+              Fill Demo Admin
+            </button>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              className="btn btn-accent"
+              onClick={async () => {
+                try {
+                  await demoLogin("user");
+                  toast.success("Logged in as demo user");
+                  navigate(redirectPath, { replace: true });
+                } catch (error) {
+                  toast.error(getErrorMessage(error, "Demo login failed"));
+                }
+              }}
+            >
+              Demo Login User
+            </button>
+            <button
+              type="button"
+              className="btn btn-accent"
+              onClick={async () => {
+                try {
+                  await demoLogin("admin");
+                  toast.success("Logged in as demo admin");
+                  navigate(redirectPath, { replace: true });
+                } catch (error) {
+                  toast.error(getErrorMessage(error, "Demo login failed"));
+                }
+              }}
+            >
+              Demo Login Admin
+            </button>
+          </div>
 
           <p className="text-sm text-[var(--text-soft)]">
-            New user? <Link className="font-semibold text-[var(--primary)]" to="/register">Create account</Link>
+            New user?{" "}
+            <Link className="font-semibold text-[var(--primary)]" to="/register">
+              Create account
+            </Link>
           </p>
         </div>
       </div>
